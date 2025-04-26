@@ -13,11 +13,9 @@ class Students extends Model
     public $table = 'students';
 
     public $fillable = [
-        'id_number',
         'first_name',
-        'middle_name',
         'last_name',
-        'student_id'
+        // 'student_id'
     ];
 
   public function grades()

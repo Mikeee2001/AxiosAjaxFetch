@@ -19,10 +19,11 @@ class TransactionController extends Controller
      }
 
     public function displayDataUsingJs(){
-        $student = Students::with('departments', 'grades')->with(['grades' => function($grade){
-            $grade->selectRaw("*, COALESCE(CAST((MidtermGrade + FinalGrade) / 2 AS DECIMAL(10,2)), 0) AS cumulativeGrade");
-        }])
-        ->get();
+        $student = Students::latest()->get();
+        // $student = Students::with('departments', 'grades')->with(['grades' => function($grade){
+        //     $grade->selectRaw("*, COALESCE(CAST((MidtermGrade + FinalGrade) / 2 AS DECIMAL(10,2)), 0) AS cumulativeGrade");
+        // }])
+        // ->get();
 
         return response()->json(["success" => true, "students" =>  $student], 200);
     }
@@ -38,4 +39,31 @@ class TransactionController extends Controller
         //return response()->json(["success" => true, "students" =>  $student], 200);
     }
 
+
+    public function addStudent(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+            ]);
+
+            $student = Students::create([
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Student added successfully!',
+                'student' => $student
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add student',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

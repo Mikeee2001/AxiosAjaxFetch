@@ -1,124 +1,84 @@
 $(document).ready(function () {
-    $('.table').DataTable({
+    $('.studentsTable').DataTable({
         ordering: true,
         paging: true,
         searching: true,
-        responsive: true,
+        responsive: true
+    });
 
+    var fname = $('#firstname')
+    var lname = $('#lastname')
+
+    function displayStudents() {
+        axios.get('api/auth/display/student')
+        .then(function(response) {
+            var stud = response.data.students;
+            if (response.data.success) {
+                var table = $('.studentsTable').DataTable();
+                table.clear();
+
+                // Ensure data matches table headers
+                stud.forEach(function(item) {
+                    table.row.add([
+                        `<div class="text-center">${item.id}</div>`,
+                        `<div class="text-center">${item.first_name}</div>`,
+                        `<div class="text-center">${item.last_name}</div>`,
+                        `<div class="d-flex align-items-center justify-content-center ml-2 forTags">
+                           <div><a type="button" class="ml-2 btn btn-info" data-mdb-ripple-init>View</a></div>
+                           <div><a type="button" class="ml-2 btn btn-warning" data-mdb-ripple-init>Edit</a></div>
+                           <div><a type="button" class="ml-2 btn btn-danger" data-mdb-ripple-init>Delete</a></div>
+                        </div>`
+                    ]);
+                });
+
+                table.draw(false);
+            }
+        })
+        .catch(function(error) {
+            console.error(error);
+        });
+    }
+
+    displayStudents();
+
+    $('.addStudent').on('click', () => {
+        $('.addStudentModal').show();
+    });
+
+    $('.saveButtons').on('click', function(){
+
+        // console.log('test')
+        if(fname.val().trim() ===  "" || lname.val().trim() ===  "" )
+        {
+            alert("Please fill all the fields");
+            return
+        }
+
+        axios.post('/api/auth/add-student',{
+            first_name: fname.val().trim(),
+            last_name:  lname.val().trim(),
+        }).then((response) =>
+        {
+            console.log(response)
+            closeModal()
+            displayStudents()
+            clearFields()
+
+        }).catch((error) =>
+    {
+        console.error(error)
     })
 
-    // AJAX request to fetch student data
+    })
+});
 
-    // $.ajax({
-    //     url: 'api/auth/display/student',
-    //     type: 'GET',
-    //     success: function(response)
-    //     {
-    //         console.log(response)
-    //     },
-    //     error:function(xhr,status,error)
-    //     {
-    //         console.error(xhr,responseText)
-    //     }
-    // })
+function closeModal(){
+    $('.addStudentModal').hide();
+}
 
-    //AJAX request to fetch student data
+function clearFields()
+{
+    $('#firstname').val("");
+    $('#lastname').val("");
+}
 
-    //  $.ajax({
-    //     url: 'api/auth/display/student',
-    //     type: 'GET',
-    //     success: function(response)
-    //     {
-    //         var stud = response.students
-
-    //         if(response.success)
-    //             console.log(stud)
-    //             var body = $('#tablebody')
-    //             body.empty()
-
-    //             for(var i = 0; i < stud.length; i++)
-    //             {
-    //                 body.append(`<tr>
-    //                     <td>${stud[i].id_number}</td>
-    //                     <td>${stud[i].last_name}, ${stud[i].first_name} ${stud[i].middle_name}</td>
-    //                     <td>${stud[i].departments[0]?.departments || "N/A"}</td>
-    //                     <td>${stud[i].grades[0]?.MidtermGrade || "N/A"}</td>
-    //                     <td>${stud[i].grades[0]?.FinalGrade || "N/A"}</td>
-    //                     <td>${stud[i].grades[0]?.cumulativeGrade || "N/A"}</td>
-    //                 </tr>`);
-
-    //             }
-
-    //     },
-    //     error:function(xhr,status,error)
-    //     {
-    //         console.error(xhr,responseText)
-    //     }
-    // })
-
-    //AXIOS
-
-    //     axios.get('api/auth/display/student').then(function(response)
-    //     {
-    //     var stud =  response.data.students
-    //     if(response.data.success)
-    //     {
-    //          console.log(stud)
-    //         var body = $('#tablebody')
-    //              body.empty()
-
-    //              stud.forEach(function(item)
-    //             {
-    //                 body.append(
-    //                     `<tr>
-    //                       <td>${item.id_number}</td>
-    //                       <td>${item.last_name}, ${item.first_name} ${item.middle_name}</td>
-    //                      <td>${item.departments[0]?.departments}</td>
-    //                      <td>${item.grades[0]?.MidtermGrade}</td>
-    //                      <td>${item.grades[0]?.FinalGrade}</td>
-    //                      <td>${item.grades[0]?.cumulativeGrade }</td>
-    //                      </tr>`);
-
-    //             });
-    //     }
-    //     //console.log(stud)
-    //     console.log(response)
-    // }).catch(function(error)
-    // {
-    //     console.error(error)
-    // })
-
-    //FETCH
-    fetch('api/auth/display/student')
-        .then(response => response.json())
-        .then(data => {
-            //console.log(data)
-            if (data.success) {
-                var stud = data.students
-                console.log(stud)
-                var body = $('#tablebody')
-                body.empty()
-
-
-                let index = 0;
-                console.log(stud.length)
-                while (index < stud.length) {
-                    body.append(
-                        `<tr>
-                                              
-            <td>${stud[index].id_number}</td>
-            <td>${stud[index].last_name}, ${stud[index].first_name} ${stud[index].middle_name}</td>
-            <td>${stud[index].departments?.[0]?.departments || "No department"}</td>
-            <td>${stud[index].grades?.[0]?.MidtermGrade || "No midterm grade"}</td>
-            <td>${stud[index].grades?.[0]?.FinalGrade || "No final grade"}</td>
-            <td>${stud[index].grades?.[0]?.cumulativeGrade || "No cumulative grade"}</td>
-        </tr>`)
-
-                    index++;
-                }
-            }
-        }).catch(function (error) {
-            console.error(error)
-        })
-
-})
