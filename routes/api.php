@@ -43,11 +43,11 @@ Route::delete('/delete-products/{id}', [ProductController::class, 'deleteProduct
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'user']);
+
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/fetch-products', [ProductController::class, 'fetchProducts']);
 
-Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
+ Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Userss;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,19 +15,19 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:userss', // Fix table reference
             'password' => 'required|string|min:8',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => 422, // Unprocessable Entity
+                'status' => 422,
                 'validation_errors' => $validator->messages(),
                 'message' => 'Validation failed. Please check the input fields.',
             ]);
         }
 
-        $user = User::create([
+        $user = Userss::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -41,6 +42,7 @@ class AuthController extends Controller
             'message' => 'User registered successfully',
         ]);
     }
+
 
     public function login(Request $request)
     {
@@ -73,6 +75,7 @@ class AuthController extends Controller
             'message' => 'Login successful!',
         ]);
     }
+
 
     public function logout(Request $request)
     {
